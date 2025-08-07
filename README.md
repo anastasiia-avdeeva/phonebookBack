@@ -23,7 +23,7 @@ The backend (with the bundled frontend) is deployed on Render: **[myphonebook-j6
 ## Project Structure
 
 ```plaintext
-.
+./
 |-- dist/ # Production-ready frontend build (served by Express)
 |-- index.js # Express server entry point
 |-- requests/requests.rest  # Sample API requests for testing with VS Code  REST Client
@@ -34,8 +34,8 @@ The backend (with the bundled frontend) is deployed on Render: **[myphonebook-j6
 
 ## Deployment Notes
 
-- Frontend is built with React and Vite, using npm run build, and the resulting static files are served by the Express backend from the dist/ folder
-- Express serves the static frontend using express.static('dist')
+- Frontend is built with React and Vite, using `npm run build`, and the resulting static files are served by the Express backend from the dist/ folder
+- Express serves the static frontend using `express.static('dist')`
 - The project is deployed to Render, with the dist/ folder included in the repo (not gitignored).
 
 ## Development
@@ -44,8 +44,8 @@ To run the project locally:
 
 1. Clone the repo
 2. Install dependencies:
-npm install
+`npm install`
 3. Start the server:
-npm run dev
+`npm run dev`
 
 Use the requests/requests.rest file with the REST Client extension in VS Code to test the API.
