@@ -50,10 +50,6 @@ const generateRandomId = () => {
   return String(id);
 };
 
-app.get("/", (req, resp) => {
-  resp.send("<h1>Phonebook</h1>");
-});
-
 app.get("/api/persons", (req, resp) => {
   resp.json(persons);
 });
