@@ -64,6 +64,33 @@ app.get("/info", (req, resp) => {
   });
 });
 
+app.post("/api/persons", (req, resp) => {
+  const entry = req.body;
+
+  if (!entry.name || !entry.number) {
+    return resp.status(400).json({
+      error: "Content missing",
+    });
+  }
+
+  Person.findOne({ name: entry.name })
+    .then((person) => {
+      if (person) {
+        return resp.status(400).json({
+          error: "Name must be unique",
+        });
+      }
+
+      const newPerson = new Person({
+        name: entry.name,
+        number: entry.number,
+      });
+
+      return newPerson.save();
+    })
+    .then((savedPerson) => resp.json(savedPerson));
+});
+
 app.get("/api/persons/:id", (req, resp) => {
   const id = req.params.id;
   const target = persons.find((person) => person.id === id);
@@ -79,29 +106,6 @@ app.delete("/api/persons/:id", (req, resp) => {
   const id = req.params.id;
   persons = persons.filter((person) => person.id !== id);
   resp.status(204).end();
-});
-
-app.post("/api/persons", (req, resp) => {
-  const entry = req.body;
-
-  if (!entry.name || !entry.number) {
-    return resp.status(400).json({
-      error: "Content missing",
-    });
-  }
-
-  if (persons.some((person) => person.name === entry.name)) {
-    return resp.status(400).json({
-      error: "Name must be unique",
-    });
-  }
-
-  const person = {
-    id: generateRandomId(),
-    ...entry,
-  };
-  persons = persons.concat(person);
-  resp.json(person);
 });
 
 const PORT = process.env.PORT;
