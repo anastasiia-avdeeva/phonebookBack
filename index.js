@@ -49,18 +49,19 @@ const generateRandomId = () => {
 };
 
 app.get("/api/persons", (req, resp) => {
-  console.log(resp);
   Person.find({}).then((persons) => {
     resp.json(persons);
   });
 });
 
 app.get("/info", (req, resp) => {
-  const arrLen = persons.length;
-  const contactsInfo = `Phonebook has info for ${arrLen} ${
-    arrLen === 1 ? "person" : "people"
-  }`;
-  resp.send(`<p>${contactsInfo}</p><p>${new Date()}</p>`);
+  Person.find({}).then((persons) => {
+    const arrLen = persons.length;
+    const contactsInfo = `Phonebook has info for ${arrLen} ${
+      arrLen === 1 ? "person" : "people"
+    }`;
+    resp.send(`<p>${contactsInfo}</p><p>${new Date()}</p>`);
+  });
 });
 
 app.get("/api/persons/:id", (req, resp) => {
