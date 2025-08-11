@@ -37,12 +37,14 @@ if (!personName && !personNumber) {
     name: personName,
     number: personNumber,
   });
+
   person.save().then((result) => {
-    console.log(result);
     console.log(`added ${personName}'s number ${personNumber} to phonebook`);
+
     mongoose.connection.close();
   });
 } else {
   console.log("Please, provide both name and number for new entry");
+
   mongoose.connection.close();
 }
