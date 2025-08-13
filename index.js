@@ -85,11 +85,11 @@ app.get("/api/persons/:id", (req, resp, next) => {
 app.post("/api/persons", (req, resp, next) => {
   const entry = req.body;
 
-  if (!entry.number) {
-    return resp.status(400).json({
-      error: "Content missing",
-    });
-  }
+  // if (!entry.number) {
+  //   return resp.status(400).json({
+  //     error: "Content missing",
+  //   });
+  // }
 
   Person.findOne({ name: entry.name })
     .then((person) => {
@@ -112,12 +112,14 @@ app.post("/api/persons", (req, resp, next) => {
 app.put("/api/persons/:id", (req, resp, next) => {
   const { name, number } = req.body;
 
-  if (!number) {
-    return resp.status(400).json({
-      error: "Content missing",
-    });
-  }
+  // if (!number) {
+  //   return resp.status(400).json({
+  //     error: "Content missing",
+  //   });
+  // }
   const id = req.params.id;
+
+  // return next(new Error("Simulated internal server error"));
 
   Person.findById(id)
     .then((person) => {
