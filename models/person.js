@@ -16,7 +16,12 @@ mongoose
   });
 
 const personSchema = new mongoose.Schema({
-  name: String,
+  name: {
+    type: String,
+    required: [true, "A name is required"],
+    minLength: [3, "Name must be at least 3 characters long"],
+    trim: true,
+  },
   number: String,
 });
 

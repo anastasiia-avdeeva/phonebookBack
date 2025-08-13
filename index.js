@@ -68,10 +68,24 @@ app.get("/info", (req, resp, next) => {
     .catch((error) => next(error));
 });
 
+app.get("/api/persons/:id", (req, resp, next) => {
+  const id = req.params.id;
+
+  Person.findById(id)
+    .then((person) => {
+      if (person) {
+        resp.json(person);
+      } else {
+        resp.status(404).end();
+      }
+    })
+    .catch((error) => next(error));
+});
+
 app.post("/api/persons", (req, resp, next) => {
   const entry = req.body;
 
-  if (!entry.name || !entry.number) {
+  if (!entry.number) {
     return resp.status(400).json({
       error: "Content missing",
     });
@@ -95,22 +109,14 @@ app.post("/api/persons", (req, resp, next) => {
     .catch((error) => next(error));
 });
 
-app.get("/api/persons/:id", (req, resp, next) => {
-  const id = req.params.id;
-
-  Person.findById(id)
-    .then((person) => {
-      if (person) {
-        resp.json(person);
-      } else {
-        resp.status(404).end();
-      }
-    })
-    .catch((error) => next(error));
-});
-
 app.put("/api/persons/:id", (req, resp, next) => {
   const { name, number } = req.body;
+
+  if (!number) {
+    return resp.status(400).json({
+      error: "Content missing",
+    });
+  }
   const id = req.params.id;
 
   Person.findById(id)
@@ -145,6 +151,10 @@ const errorHandler = (error, req, resp, next) => {
 
   if (error.name === "CastError") {
     return resp.status(400).send({ error: "malformatted id" });
+  } else if (error.name === "ValidationError") {
+    // console.log("Start: ", error.errors.name.properties.message);
+    console.log(error.errors);
+    return resp.status(400).json({ error: error.message });
   }
 
   next(error);
