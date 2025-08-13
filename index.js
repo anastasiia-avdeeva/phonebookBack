@@ -8,7 +8,7 @@ app.use(express.static("dist"));
 app.use(express.json());
 
 logger.token("body", (req, resp) =>
-  req.method === "POST" ? JSON.stringify(req.body) : " "
+  req.method === "POST" || req.method === "PUT" ? JSON.stringify(req.body) : " "
 );
 
 app.use(
@@ -48,23 +48,27 @@ const generateRandomId = () => {
   return String(id);
 };
 
-app.get("/api/persons", (req, resp) => {
-  Person.find({}).then((persons) => {
-    resp.json(persons);
-  });
+app.get("/api/persons", (req, resp, next) => {
+  Person.find({})
+    .then((persons) => {
+      resp.json(persons);
+    })
+    .catch((error) => next(error));
 });
 
-app.get("/info", (req, resp) => {
-  Person.find({}).then((persons) => {
-    const arrLen = persons.length;
-    const contactsInfo = `Phonebook has info for ${arrLen} ${
-      arrLen === 1 ? "person" : "people"
-    }`;
-    resp.send(`<p>${contactsInfo}</p><p>${new Date()}</p>`);
-  });
+app.get("/info", (req, resp, next) => {
+  Person.find({})
+    .then((persons) => {
+      const arrLen = persons.length;
+      const contactsInfo = `Phonebook has info for ${arrLen} ${
+        arrLen === 1 ? "person" : "people"
+      }`;
+      resp.send(`<p>${contactsInfo}</p><p>${new Date()}</p>`);
+    })
+    .catch((error) => next(error));
 });
 
-app.post("/api/persons", (req, resp) => {
+app.post("/api/persons", (req, resp, next) => {
   const entry = req.body;
 
   if (!entry.name || !entry.number) {
@@ -86,28 +90,67 @@ app.post("/api/persons", (req, resp) => {
         number: entry.number,
       });
 
-      return newPerson.save();
+      return newPerson.save().then((savedPerson) => resp.json(savedPerson));
     })
-    .then((savedPerson) => resp.json(savedPerson));
+    .catch((error) => next(error));
 });
 
-app.get("/api/persons/:id", (req, resp) => {
+app.get("/api/persons/:id", (req, resp, next) => {
   const id = req.params.id;
 
-  Person.findById(id).then((person) => {
-    resp.json(person);
-  });
-
-  // if (!target) {
-  //   return resp.status(404).end();
-  // }
+  Person.findById(id)
+    .then((person) => {
+      if (person) {
+        resp.json(person);
+      } else {
+        resp.status(404).end();
+      }
+    })
+    .catch((error) => next(error));
 });
 
-app.delete("/api/persons/:id", (req, resp) => {
+app.put("/api/persons/:id", (req, resp, next) => {
+  const { name, number } = req.body;
   const id = req.params.id;
-  persons = persons.filter((person) => person.id !== id);
-  resp.status(204).end();
+
+  Person.findById(id)
+    .then((person) => {
+      if (!person) {
+        return resp.status(404).end();
+      }
+      person.name = name;
+      person.number = number;
+
+      return person.save().then((updatedPerson) => resp.json(updatedPerson));
+    })
+    .catch((error) => next(error));
 });
+
+app.delete("/api/persons/:id", (req, resp, next) => {
+  const id = req.params.id;
+
+  Person.findByIdAndDelete(id)
+    .then((result) => resp.status(204).end())
+    .catch((error) => next(error));
+});
+
+const unknownEndpoint = (req, resp) => {
+  resp.status(404).send({ error: "unknown endpoint" });
+};
+
+app.use(unknownEndpoint);
+
+const errorHandler = (error, req, resp, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError") {
+    return resp.status(400).send({ error: "malformatted id" });
+  }
+
+  next(error);
+};
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
