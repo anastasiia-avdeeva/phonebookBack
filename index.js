@@ -15,28 +15,28 @@ app.use(
   logger(":method :url :status :res[content-length] - :response-time ms :body")
 );
 
-let p = [
-  // {
-  //   id: "1",
-  //   name: "Arto Hellas",
-  //   number: "040-123456",
-  // },
-  // {
-  //   id: "2",
-  //   name: "Ada Lovelace",
-  //   number: "39-44-5323523",
-  // },
-  // {
-  //   id: "3",
-  //   name: "Dan Abramov",
-  //   number: "12-43-234345",
-  // },
-  // {
-  //   id: "4",
-  //   name: "Mary Poppendieck",
-  //   number: "39-23-6423122",
-  // },
-];
+// let p = [
+//   {
+//     id: "1",
+//     name: "Arto Hellas",
+//     number: "040-123456",
+//   },
+//   {
+//     id: "2",
+//     name: "Ada Lovelace",
+//     number: "39-44-5323523",
+//   },
+//   {
+//     id: "3",
+//     name: "Dan Abramov",
+//     number: "12-43-234345",
+//   },
+//   {
+//     id: "4",
+//     name: "Mary Poppendieck",
+//     number: "39-23-6423122",
+//   },
+// ];
 
 const generateRandomId = () => {
   let id;
@@ -93,13 +93,14 @@ app.post("/api/persons", (req, resp) => {
 
 app.get("/api/persons/:id", (req, resp) => {
   const id = req.params.id;
-  const target = persons.find((person) => person.id === id);
 
-  if (!target) {
-    return resp.status(404).end();
-  }
+  Person.findById(id).then((person) => {
+    resp.json(person);
+  });
 
-  return resp.json(target);
+  // if (!target) {
+  //   return resp.status(404).end();
+  // }
 });
 
 app.delete("/api/persons/:id", (req, resp) => {
