@@ -112,14 +112,7 @@ app.post("/api/persons", (req, resp, next) => {
 app.put("/api/persons/:id", (req, resp, next) => {
   const { name, number } = req.body;
 
-  // if (!number) {
-  //   return resp.status(400).json({
-  //     error: "Content missing",
-  //   });
-  // }
   const id = req.params.id;
-
-  // return next(new Error("Simulated internal server error"));
 
   Person.findById(id)
     .then((person) => {
@@ -154,8 +147,6 @@ const errorHandler = (error, req, resp, next) => {
   if (error.name === "CastError") {
     return resp.status(400).send({ error: "malformatted id" });
   } else if (error.name === "ValidationError") {
-    // console.log("Start: ", error.errors.name.properties.message);
-    console.log(error.errors);
     return resp.status(400).json({ error: error.message });
   }
 
